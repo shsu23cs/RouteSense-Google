@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+
+/* ── Design tokens ─────────────────────────────────────────────────── */
+:root {
+  --bg-base:      #050d1a;
+  --bg-card:      rgba(255,255,255,0.04);
+  --bg-card-hover:rgba(255,255,255,0.07);
+  --bg-surface:   #0a1628;
+  --border:       rgba(255,255,255,0.08);
+  --border-glow:  rgba(0,212,255,0.3);
+
+  --cyan:    #00d4ff;
+  --cyan-dim: rgba(0,212,255,0.15);
+  --purple:  #7c3aed;
+  --purple-dim: rgba(124,58,237,0.15);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #3b82f6;
+
+  --text-primary:   #e8f4ff;
+  --text-secondary: #7a93b4;
+  --text-muted:     #4a617a;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+
+/* ── Glass card ─────────────────────────────────────────────────────── */
+.glass {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, background 0.2s;
+}
+.glass:hover { background: var(--bg-card-hover); border-color: rgba(255,255,255,0.12); }
+
+/* ── Gradient text ─────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Severity badges ────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.badge-none     { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+.badge-low      { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+.badge-medium   { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.badge-high     { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.badge-critical { background: rgba(239,68,68,0.25);  color: #ff6b6b; border: 1px solid rgba(239,68,68,0.5); animation: pulse-border 2s infinite; }
+.badge-info     { background: rgba(0,212,255,0.15);  color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+
+/* Status badges */
+.badge-in_transit { background: rgba(0,212,255,0.12); color: #00d4ff; border: 1px solid rgba(0,212,255,0.25); }
+.badge-delivered  { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+.badge-delayed    { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+.badge-disrupted  { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.35); }
+
+/* ── Animations ─────────────────────────────────────────────────────── */
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(239,68,68,0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+  50%       { box-shadow: 0 0 40px rgba(0,212,255,0.25); }
+}
+
+.animate-fade-in-up   { animation: fade-in-up 0.4s ease forwards; }
+.animate-slide-in     { animation: slide-in-right 0.3s ease forwards; }
+.animate-glow         { animation: glow-pulse 3s ease-in-out infinite; }
+
+/* ── Buttons ────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #0099cc, #7c3aed);
+  color: white; box-shadow: 0 4px 15px rgba(0,212,255,0.2);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(0,212,255,0.35); }
+.btn-ghost {
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+.btn-danger {
+  background: rgba(239,68,68,0.15); color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+.btn-success {
+  background: rgba(16,185,129,0.15); color: #10b981;
+  border: 1px solid rgba(16,185,129,0.3);
+}
+.btn-success:hover { background: rgba(16,185,129,0.25); }
+
+/* ── Form controls ─────────────────────────────────────────────────── */
+.input, select.input {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--text-primary); border-radius: 10px; padding: 8px 14px;
+  font-size: 13px; font-family: inherit; outline: none; width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input:focus, select.input:focus {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+}
+select.input option { background: #0a1628; }
+
+/* ── Progress bar ────────────────────────────────────────────────────── */
+.progress-track {
+  width: 100%; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  transition: width 0.6s ease;
+}
+
+/* ── Leaflet overrides ─────────────────────────────────────────────── */
+.leaflet-container {
+  background: #050d1a !important;
+  border-radius: 16px;
+}
+.leaflet-tile { filter: brightness(0.6) saturate(0.7) hue-rotate(180deg); }
+.leaflet-control-attribution { display: none; }
+.leaflet-control-zoom a {
+  background: rgba(10,22,40,0.9) !important;
+  color: var(--cyan) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Layout helpers ─────────────────────────────────────────────────── */
+.page-title {
+  font-size: 22px; font-weight: 700; color: var(--text-primary);
+}
+.section-title {
+  font-size: 13px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted);
+}
